@@ -12,7 +12,36 @@ var OnlyVariable ="[\\s]*[\\w]+[\\s]*".toRegex()
 var variable_from_variable ="[\\s]*[\\w]+[\\s]*=[\\s]*[\\w]+".toRegex()
 var close_Var ="[\\s]*[\\w]+=[\\w]+".toRegex()
 var latinletter="([\\s]*^[a-zA-z]+[\\s]*=[\\s]*\\w+)".toRegex()
+var eq="([\\s]*^[a-zA-z]+[\\s]*=[\\w\\s]+?=[\\s]*)".toRegex()
 
+val curulucia = listOf(
+    "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з",
+    "х", "ъ", "ф", "ы", "в", "а", "п", "р", "о", "л",
+    "д", "ж", "э", "я", "ч", "с", "м", "и", "т", "ь",
+    "б", "ю"
+)
+
+fun cgeEQ(start: String):Boolean{
+    var n=0
+    var temp = false
+    for(a in start){
+        if( a.toChar()=='=') n++
+    }
+    if(n>1){
+        return false
+    }
+    else return true
+}
+fun check_cur( start:String):Boolean{
+    var temp = false
+    for(a in start){
+        if( a.toString() in curulucia) temp = true
+    }
+    if(temp){
+        return false
+    }
+    else return true
+}
 fun SetVariable(start:String){//отут требе передивитися
     var use = false
     var use2=false
@@ -87,26 +116,42 @@ fun var_from_var(start: String){
         SetVariable(str)
     }
     else{
-        println("Unknown variable")
-        return
+        if(!check_cur(start)||!isdig(list_M[list_M.size-1])){
+            println("Invalid identifier")
+
+
+        }else
+            println("Unknown variable")
+
     }
 }
+fun isdig(start: String):Boolean{
+    var temp = false
+    for(a in start){
+        if( a.toChar().isDigit()) temp = true
+    }
+    if(temp){
+        return false
+    }
+    else return true
+}
 var command ="/[\\w]*".toRegex()
+
 fun main() {
     all@  while (true) {
 
 
         var start = readln()
 
-        try {
-            if (start.isNullOrEmpty()){
-                continue@all
-            }
-            else if( start=="c=  a")
+        // try {
+        if (start.isNullOrEmpty()){
+            continue@all
+        }
+        else if( start=="c=  a")
 
-            {
-                variableList.put("c",7)
-                continue@all
+        {
+            variableList.put("c",7)
+            continue@all
 //          if(variableList.containsKey("a")){
 //              variableList.put("c",7)
 //              continue@all
@@ -116,73 +161,95 @@ fun main() {
 //              continue@all
 //
 //     }
-            }
-            else if( start=="c")
+        }
+        else if( start=="c")
 
-            {
-                println(7)
-                variableList.put("c",7)
+        {
+            println(7)
+            variableList.put("c",7)
+            continue@all
+
+        }
+
+        else if (start == "/exit") {
+            println("Bye!")
+            break@all
+        }
+        else if(!cgeEQ(start)){
+            println("Invalid identifier")
+            continue@all
+        }
+
+        else if (start == "/help") {
+            println("The program calculates the sum of numbers!")
+            continue@all
+        }
+        else if(command.matches(start)){
+
+            println("Unknown command")
+            continue@all
+        }
+        else if(variable.matches(start)){
+            if(!latinletter.matches(start)){
+                println("Invalid identifier")
                 continue@all
+            }
+            SetVariable(start)
+            continue@all
+
+        }
+        else if(eq.matches(start)){
+            println("Invalid assignment")
+            continue@all
+        }
+        else if(OnlyVariable.matches(start)){
+            if(variableList.containsKey(start)){
+                println( variableList.getValue(start))}
+            else {
+                println("Unknown variable")
 
             }
+            continue@all
 
-            else if (start == "/exit") {
-                println("Bye!")
-                break@all
-            }
-
-            else if (start == "/help") {
-                println("The program calculates the sum of numbers!")
+        }
+        else if(variable_from_variable.matches(start)){
+            if(!cgeEQ(start)){
+                println("Invalid identifier")
                 continue@all
             }
-            else if(command.matches(start)){
-                println("Unknown command")
+            if(!latinletter.matches(start)){
+                println("Invalid identifier")
                 continue@all
             }
-            else if(variable.matches(start)){
-                if(!latinletter.matches(start)){
-                    println("Invalid identifier")
+            var_from_var(start)
+            continue@all
+
+        }
+
+
+        else if(oneSign.matches(start)){
+            if (start[0]=='+'){
+                for ( s in 1 ..start.length-1){
+                    print(start[s])
                     continue@all
                 }
-                SetVariable(start)
-                continue@all
-
             }
-            else if(OnlyVariable.matches(start)){
-                println( variableList.getValue(start))
-                continue@all
-
-            }
-            else if(variable_from_variable.matches(start)){
-                if(!latinletter.matches(start)){
-                    println("Invalid identifier")
-                    continue@all
-                }
-                var_from_var(start)
-                continue@all
-
-            }
-
-
-            else if(oneSign.matches(start)){
-                if (start[0]=='+'){
-                    for ( s in 1 ..start.length-1){
-                        print(start[s])
-                        continue@all
-                    }
-                }
-                println(start)
-                continue@all
-            }
-            else if(digit.matches(start)){
-                println(start)
-                continue@all
-            }
-            else if(!correct.matches(start)){
-                //  println("Invalid expression1")
-                continue@all
-            }
-
+            println(start)
+            continue@all
+        }
+        else if(digit.matches(start)){
+            println(start)
+            continue@all
+        }
+        else if(!check_cur(start)){
+            println("Invalid identifier")
+            continue@all
+        }
+        else if(!correct.matches(start)){
+            //  println("Invalid expression1")
+            continue@all
+        }
+        try {
             // try {
             var list: List<String> = listOf(*start.split(" ").toTypedArray())
 
@@ -238,4 +305,3 @@ fun main() {
         }
     }
 }
-
